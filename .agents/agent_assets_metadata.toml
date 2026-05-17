@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "nSpOTEkLlngOF-zkuHEH0"
+uri = "file://images/lula_kabab.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "hZaak_o1EVx3-RoCWnOjy"
+uri = "file://images/toshkent_kabab.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OU3IShkznCTLs5JGKecZt"
+uri = "file://images/adana_kabab.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "fdX7GwOwOSCKP5Wv5vTWW"
+uri = "file://images/shashlik.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "MBZrfTYkX_9uDcqrkJPwy"
+uri = "file://images/tandir_kabab.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Rg-D7pJOYz9YZ5CAcyozo"
+uri = "file://images/baliq_kabab.png"
+type = "image"
+title = "generated_image"

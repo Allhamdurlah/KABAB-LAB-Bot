@@ -1,5 +1,8 @@
 import os
+import json
 import logging
+from datetime import datetime, timezone
+from pathlib import Path
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     Application,
@@ -15,6 +18,38 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
+
+STATS_FILE = Path(__file__).parent / "stats.json"
+
+
+def _load_stats() -> dict:
+    if STATS_FILE.exists():
+        try:
+            return json.loads(STATS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"all_time": {"orders": 0, "revenue": 0, "kabab_counts": {}}, "daily": {}}
+
+
+def _save_stats(stats: dict) -> None:
+    STATS_FILE.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def record_order(kabab: str, price: int) -> None:
+    stats = _load_stats()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    stats["all_time"]["orders"] += 1
+    stats["all_time"]["revenue"] += price
+    stats["all_time"]["kabab_counts"][kabab] = stats["all_time"]["kabab_counts"].get(kabab, 0) + 1
+
+    if today not in stats["daily"]:
+        stats["daily"][today] = {"orders": 0, "revenue": 0, "kabab_counts": {}}
+    stats["daily"][today]["orders"] += 1
+    stats["daily"][today]["revenue"] += price
+    stats["daily"][today]["kabab_counts"][kabab] = stats["daily"][today]["kabab_counts"].get(kabab, 0) + 1
+
+    _save_stats(stats)
 
 MENU = {
     "Lula Kabab": {
@@ -186,6 +221,8 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     )
     await update.message.reply_text(summary, parse_mode="Markdown")
 
+    record_order(d["kabab"], d["price"])
+
     admin_chat_id = os.environ.get("ADMIN_CHAT_ID")
     if admin_chat_id:
         user = update.effective_user
@@ -237,6 +274,37 @@ async def aloqa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
+async def statistika(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    admin_chat_id = os.environ.get("ADMIN_CHAT_ID")
+    if not admin_chat_id or str(update.effective_user.id) != admin_chat_id.strip():
+        await update.message.reply_text("⛔ Bu buyruq faqat admin uchun.")
+        return
+
+    stats = _load_stats()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    at = stats["all_time"]
+    day = stats["daily"].get(today, {"orders": 0, "revenue": 0, "kabab_counts": {}})
+
+    top_all = sorted(at["kabab_counts"].items(), key=lambda x: x[1], reverse=True)
+    top_today = sorted(day["kabab_counts"].items(), key=lambda x: x[1], reverse=True)
+
+    def kabab_lines(items):
+        return "\n".join(f"  {i+1}. {name} — {count} ta" for i, (name, count) in enumerate(items)) or "  —"
+
+    msg = (
+        "📊 *KABABLEB — Statistika*\n\n"
+        f"📅 *Bugun ({today}):*\n"
+        f"🛒 Buyurtmalar: *{day['orders']} ta*\n"
+        f"💰 Daromad: *{day['revenue']:,} so'm*\n"
+        f"🏆 Top kabab:\n{kabab_lines(top_today)}\n\n"
+        f"📈 *Umumiy (jami):*\n"
+        f"🛒 Buyurtmalar: *{at['orders']} ta*\n"
+        f"💰 Daromad: *{at['revenue']:,} so'm*\n"
+        f"🏆 Top kabab:\n{kabab_lines(top_all)}"
+    )
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
 async def ish_vaqti(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "🕐 *KABABLEB — Ish vaqti*\n\n"
@@ -275,6 +343,7 @@ def main() -> None:
     app.add_handler(CommandHandler("menyu", menyu))
     app.add_handler(CommandHandler("aloqa", aloqa))
     app.add_handler(CommandHandler("ish_vaqti", ish_vaqti))
+    app.add_handler(CommandHandler("statistika", statistika))
     app.add_handler(conv_handler)
 
     logger.info("KABABLEB bot ishga tushdi...")

@@ -1,7 +1,6 @@
 import os
 import logging
-from pathlib import Path
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InputMediaPhoto
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -17,37 +16,35 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-IMAGES_DIR = Path(__file__).parent / "images"
-
 MENU = {
     "Lula Kabab": {
         "narxlar": {"kichik": 18000, "orta": 25000, "katta": 35000},
-        "rasm": IMAGES_DIR / "lula_kabab.png",
+        "rasm": "https://kashevar.com/wp-content/uploads/2022/05/lula-kebab.jpg",
         "tavsif": "Nozik maydalangan go'shtdan tayyorlangan, ko'mir ustida qovurilgan kabab",
     },
     "Toshkent Kabab": {
         "narxlar": {"kichik": 20000, "orta": 28000, "katta": 38000},
-        "rasm": IMAGES_DIR / "toshkent_kabab.png",
+        "rasm": "https://chefspencil.com/wp-content/uploads/Uzbek-Shish-Kebab.jpg",
         "tavsif": "O'zbek uslubidagi an'anaviy kabab, sabzavotlar bilan",
     },
     "Adana Kabab": {
         "narxlar": {"kichik": 22000, "orta": 30000, "katta": 42000},
-        "rasm": IMAGES_DIR / "adana_kabab.png",
+        "rasm": "https://www.mommyandkitchen.com/wp-content/uploads/2022/08/adana-kebab.jpg",
         "tavsif": "Achchiq ziravorlar bilan qovurilgan kabab",
     },
     "Shashlik": {
         "narxlar": {"kichik": 25000, "orta": 35000, "katta": 50000},
-        "rasm": IMAGES_DIR / "shashlik.png",
+        "rasm": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/f6/e4/b0/caption.jpg",
         "tavsif": "Marinadlangan go'sht parchalaridan tayyorlangan klassik shashlik",
     },
     "Tandır Kabab": {
         "narxlar": {"kichik": 28000, "orta": 38000, "katta": 55000},
-        "rasm": IMAGES_DIR / "tandir_kabab.png",
+        "rasm": "https://travelinuzbekistan.com/wp-content/uploads/2020/09/tandir-kebab.jpg",
         "tavsif": "Tandır pechida pishirilgan mazali kabab",
     },
     "Baliq Kabab": {
         "narxlar": {"kichik": 30000, "orta": 42000, "katta": 60000},
-        "rasm": IMAGES_DIR / "baliq_kabab.png",
+        "rasm": "https://yummyfoodrecipes.in/wp-content/uploads/2021/fish-kabab.jpg",
         "tavsif": "Toza baliqdan tayyorlangan, limon va o'tlar bilan qovurilgan kabab",
     },
 }
@@ -85,8 +82,7 @@ async def menyu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             f"• O'rta  — {narxlar['orta']:,} so'm\n"
             f"• Katta  — {narxlar['katta']:,} so'm"
         )
-        with open(info["rasm"], "rb") as photo:
-            await update.message.reply_photo(photo=photo, caption=caption, parse_mode="Markdown")
+        await update.message.reply_photo(photo=info["rasm"], caption=caption, parse_mode="Markdown")
     await update.message.reply_text(
         "Buyurtma berish uchun /buyurtma buyrug'ini bosing! 🛒"
     )

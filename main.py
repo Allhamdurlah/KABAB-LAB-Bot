@@ -72,20 +72,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def menyu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("🍖 *KABABLEB MENYUSI*", parse_mode="Markdown")
+    lines = ["🍖 *KABABLEB MENYUSI*\n"]
     for name, info in MENU.items():
         narxlar = info["narxlar"]
-        caption = (
-            f"*{name}*\n"
-            f"_{info['tavsif']}_\n\n"
-            f"• Kichik — {narxlar['kichik']:,} so'm\n"
-            f"• O'rta  — {narxlar['orta']:,} so'm\n"
-            f"• Katta  — {narxlar['katta']:,} so'm"
-        )
-        await update.message.reply_photo(photo=info["rasm"], caption=caption, parse_mode="Markdown")
-    await update.message.reply_text(
-        "Buyurtma berish uchun /buyurtma buyrug'ini bosing! 🛒"
-    )
+        lines.append(f"🍢 *{name}*")
+        lines.append(f"• Kichik — {narxlar['kichik']:,} so'm")
+        lines.append(f"• O'rta — {narxlar['orta']:,} so'm")
+        lines.append(f"• Katta — {narxlar['katta']:,} so'm")
+        lines.append("")
+    lines.append("Buyurtma berish uchun /buyurtma buyrug'ini bosing\\! 🛒")
+    await update.message.reply_text("\n".join(lines), parse_mode="MarkdownV2")
 
 
 async def buyurtma_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

@@ -185,6 +185,31 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         "Yana buyurtma berish uchun /buyurtma bosing."
     )
     await update.message.reply_text(summary, parse_mode="Markdown")
+
+    admin_chat_id = os.environ.get("ADMIN_CHAT_ID")
+    if admin_chat_id:
+        user = update.effective_user
+        username = f"@{user.username}" if user.username else "yo'q"
+        admin_msg = (
+            "🔔 *YANGI BUYURTMA!*\n\n"
+            f"👤 Ism: {d['name']}\n"
+            f"🍖 Kabab: {d['kabab']}\n"
+            f"📏 O'lcham: {d['size_display']}\n"
+            f"💰 Narx: {d['price']:,} so'm\n"
+            f"📍 Manzil: {d['address']}\n"
+            f"📞 Telefon: {d['phone']}\n"
+            f"💬 Telegram: {username}\n"
+            f"🆔 User ID: {user.id}"
+        )
+        try:
+            await context.bot.send_message(
+                chat_id=int(admin_chat_id),
+                text=admin_msg,
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            logger.error(f"Admin xabar yuborishda xatolik: {e}")
+
     context.user_data.clear()
     return ConversationHandler.END
 

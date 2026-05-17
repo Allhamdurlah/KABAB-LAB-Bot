@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 MENU = {
     "Lula Kabab": {
         "narxlar": {"kichik": 18000, "orta": 25000, "katta": 35000},
-        "rasm": "https://kashevar.com/wp-content/uploads/2022/05/lula-kebab.jpg",
+        "rasm": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Lula-kebab.jpg/1200px-Lula-kebab.jpg",
         "tavsif": "Nozik maydalangan go'shtdan tayyorlangan, ko'mir ustida qovurilgan kabab",
     },
     "Toshkent Kabab": {
